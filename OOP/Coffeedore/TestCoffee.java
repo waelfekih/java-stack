@@ -8,6 +8,8 @@ public class TestCoffee {
         coffeeKiosk.addMenuItem("capuccino", 3.00);
         coffeeKiosk.addMenuItem("muffin", 4.00);
 
-        coffeeKiosk.newOrder();
+        coffeeKiosk.displayMenu();
+
+        
     }
 }

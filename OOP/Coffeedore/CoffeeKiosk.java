@@ -2,8 +2,9 @@ import java.util.ArrayList;
 
 public class CoffeeKiosk {
     private String name;
+    private double price;
     private boolean ready;
-    private ArrayList<Item> items;
+    private ArrayList<Item> items = new ArrayList<Item>();
     //private ArrayList<Order> orders;
 
     public CoffeeKiosk() {
@@ -16,8 +17,12 @@ public class CoffeeKiosk {
         this.items = new ArrayList<Item>();
     }
 
+    public void addMenuItem(Item item) {
+    items.add(item);
+    }
+
     public void addMenuItem(String name , double price) {
-        
+        Item item = new Item(name , price);
         items.add(item);
     }
 
