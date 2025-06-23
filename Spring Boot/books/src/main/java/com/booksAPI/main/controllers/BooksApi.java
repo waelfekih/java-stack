@@ -19,7 +19,7 @@ public class BooksApi {
 		this.bookService = bookService;
 	}
 	
-	@RequestMapping("/books")
+	@RequestMapping("/api/books")
 	public List<Book> index() {
 		return bookService.allBooks();
 	}
