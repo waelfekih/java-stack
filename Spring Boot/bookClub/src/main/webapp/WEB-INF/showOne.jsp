@@ -24,6 +24,12 @@
 		<p class="mt-5 border border-dark p-3"><b>${book.thoughts}</b></p>
 
 	</div>
-
+	
+	<div class="container mt-4 d-flex justify-content-end gap-3">
+		<a href="/books/${book.id}/edit" class="btn text-warning border-warning">Edit</a>
+		<form action="/books/delete/${book.id}" method="post" style="display: inline;">
+		    <input type="hidden" name="_method" value="delete" />
+		    <button type="submit" class="btn text-danger border-danger">Delete</button>
+		</form>
 </body>
 </html>

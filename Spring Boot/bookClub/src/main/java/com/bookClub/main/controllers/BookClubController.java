@@ -8,10 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.bookClub.main.models.BookClub;
 import com.bookClub.main.models.LoginUser;
@@ -48,15 +50,12 @@ public class BookClubController {
     	
         
         if(result.hasErrors()) {
-            // Be sure to send in the empty LoginUser before 
-            // re-rendering the page.
+            
             model.addAttribute("newLogin", new LoginUser());
             return "index";
         }
         
-        // No errors! 
-        // TO-DO Later: Store their ID from the DB in session, 
-        // in other words, log them in.
+        
         session.setAttribute("userId", user.getId());
     
         return "redirect:/books";
@@ -74,9 +73,7 @@ public class BookClubController {
             return "index";
         }
     
-        // No errors! 
-        // Store their ID from the DB in session, 
-        // in other words, log them in.
+       
         session.setAttribute("userId", user.getId());
     
         return "redirect:/books";
@@ -96,6 +93,10 @@ public class BookClubController {
     
     @GetMapping("/books/new")
     public String addPage(Model model, HttpSession session) {
+    	
+    	if(session.getAttribute("userId") == null) {
+    		return "redirect:/";
+    	}
         model.addAttribute("book", new BookClub()); 
         User user = users.findById((Long)session.getAttribute("userId"));
         model.addAttribute("user", user);
@@ -103,7 +104,11 @@ public class BookClubController {
     }
 
     @PostMapping("/books/create")
-    public String createBook(@Valid @ModelAttribute("book") BookClub book, BindingResult result) {
+    public String createBook(@Valid @ModelAttribute("book") BookClub book, BindingResult result, HttpSession session) {
+    	
+    	if(session.getAttribute("userId") == null) {
+    		return "redirect:/";
+    	}
         if (result.hasErrors()) {
             return "create"; 
         }
@@ -132,9 +137,46 @@ public class BookClubController {
         return "showOne"; 
     }
     
+    @GetMapping("/books/{id}/edit")
+    public String editBook(@PathVariable("id") Long id, Model model, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/";
+        }
+
+        BookClub book = books.findById(id);
+        User user = users.findById(userId);
+
+        if (book == null) {
+            return "redirect:/books"; 
+        }
+
+        model.addAttribute("book", book);
+        return "edit"; 
+    }
+    
+    @PostMapping("/books/{id}/edit")
+    public String updateBook(@Valid @ModelAttribute("book") BookClub book, BindingResult result, HttpSession session) {
+        if (result.hasErrors()) {
+            return "edit";
+        }
+
+        User user = users.findById((Long) session.getAttribute("userId"));
+        book.setUser(user);
+        books.update(book);
+
+        return "redirect:/books";
+    }
+    
     @GetMapping("/logout")
     public String logout(HttpSession session) {
     	session.invalidate();
     	return "redirect:/";
+    }
+    
+    @PostMapping("/books/delete/{id}")
+    public String deleteBook(@PathVariable("id") Long id) {
+        books.delete(id);
+        return "redirect:/books"; 
     }
 }
